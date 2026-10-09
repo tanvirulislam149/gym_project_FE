@@ -1,0 +1,35 @@
+{
+  "name": "gym_management_client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.7.0",
+    "axios": "^1.9.0",
+    "chart.js": "^4.4.9",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
+    "leaflet": "^1.9.4",
+    "next": "15.3.1",
+    "react": "^19.0.0-rc.1",
+    "react-chartjs-2": "^5.3.0",
+    "react-datepicker": "^8.3.0",
+    "react-dom": "^19.0.0-rc.1",
+    "react-hook-form": "^7.56.2",
+    "react-icons": "^5.5.0",
+    "react-leaflet": "^5.0.0-rc.2",
+    "react-redux": "^9.2.0",
+    "swiper": "^11.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "daisyui": "^5.0.28",
+    "tailwindcss": "^4"
+  }
+}

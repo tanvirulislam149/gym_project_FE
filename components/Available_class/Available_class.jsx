@@ -1,0 +1,145 @@
+"use client";
+import React, { useEffect, useState } from "react";
+import api_client from "@/api_client";
+import Modal from "../Modal/Modal";
+import { useSelector } from "react-redux";
+
+const Available_class = ({ id }) => {
+  const user = useSelector((state) => state?.user?.user);
+  const [classes, setClasses] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(
+      `https://gym-management-0fmi.onrender.com/scheduled_classes/?fitness_class_id=${id}`,
+    )
+      .then((response) => response.json())
+      .then((data) => setClasses(data))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleBookClass = (cid) => {
+    setError("");
+    document.getElementById("bookClassLoading").showModal();
+    api_client
+      .post("https://gym-management-0fmi.onrender.com/book_classes/", {
+        scheduled_class: cid,
+      })
+      .then((res) => {
+        if (res.status === 201) {
+          document.getElementById("bookClassLoading").close();
+          document.getElementById("bookClassSuccess").showModal();
+        }
+      })
+      .catch((err) => {
+        if (err?.response?.data?.scheduled_class?.message) {
+          setError(err?.response?.data?.scheduled_class?.message);
+          document.getElementById("bookClassLoading").close();
+          document.getElementById("bookClassError").showModal();
+        } else if (err?.response?.data?.message) {
+          setError(err?.response?.data?.message);
+          document.getElementById("bookClassLoading").close();
+          document.getElementById("bookClassError").showModal();
+        }
+      });
+  };
+  return (
+    <div className="px-4 overflow-y-auto lg:h-[500px]">
+      {loading ? (
+        <div className="w-full mt-20 flex justify-center items-center">
+          <span className="loading loading-spinner loading-xl"></span>
+        </div>
+      ) : classes.length ? (
+        classes.map((c) => (
+          <div
+            key={c.id}
+            className="bg-[#0e1117] rounded-xl p-4 border border-gray-700 mb-3 hover:border-green-600/40 transition"
+          >
+            <div className="flex justify-between items-start flex-wrap gap-2 mb-2">
+              <div className="font-mono text-green-300 text-sm">
+                {new Date(c.date_time).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </div>
+              <div className="bg-[#1e2a24] px-2 py-1 rounded-full text-xs text-green-300">
+                {c.total_seats} seats
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-gray-300 text-sm mb-3">
+              <span>Instructor:</span>
+              <span className="font-medium text-white">{c.instructor}</span>
+            </div>
+            <button
+              disabled={new Date(c.date_time) < new Date() ? true : false}
+              onClick={() => {
+                user
+                  ? handleBookClass(c.id)
+                  : document.getElementById("my_modal_3").showModal();
+              }}
+              className="btn btn-primary text-black mt-3"
+            >
+              Book now
+            </button>
+          </div>
+        ))
+      ) : (
+        <div className="">
+          <p className="text-center">No Class Available</p>
+        </div>
+      )}
+      <Modal text={"Please login first to book a class"} />
+      <dialog id="bookClassSuccess" className="modal">
+        <div className="modal-box bg-white text-black">
+          <form method="dialog">
+            {/* if there is a button in form, it will close the modal */}
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              ✕
+            </button>
+          </form>
+          <h3 className="font-bold text-lg">Class booked successfully.</h3>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+      <dialog id="bookClassError" className="modal">
+        <div className="modal-box bg-white text-black">
+          <form method="dialog">
+            {/* if there is a button in form, it will close the modal */}
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              ✕
+            </button>
+          </form>
+          <h3 className="font-bold text-lg">{error}.</h3>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+      <dialog id="bookClassLoading" className="modal">
+        <div className="modal-box bg-white text-black">
+          <form method="dialog">
+            {/* if there is a button in form, it will close the modal */}
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              ✕
+            </button>
+          </form>
+          <div className="w-full my-20 flex justify-center items-center">
+            <span className="loading loading-spinner loading-xl"></span>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+    </div>
+  );
+};
+
+export default Available_class;
